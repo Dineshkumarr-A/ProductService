@@ -1,6 +1,8 @@
 package com.mycompany.productservice.controllers;
 
+import com.mycompany.productservice.Interface.IProductService;
 import com.mycompany.productservice.models.Product;
+import com.mycompany.productservice.services.FakeStoreProductService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -10,16 +12,23 @@ import java.util.List;
 @RequestMapping("/products")
 public class ProductController {
 
+    private IProductService productService;
+
+    ProductController(IProductService productService)
+    {
+        this.productService = productService;
+    }
+
     @GetMapping("/{id}")
     public Product getProductById(@PathVariable("id") Long id)
     {
-        return new Product();
+        return productService.getProductById(id);
     }
 
     @GetMapping
     public List<Product> getAllProducts()
     {
-        return new ArrayList<>();
+        return productService.getAllProducts();
     }
 
     @PostMapping

@@ -48,21 +48,15 @@ public class FakeStoreProductService implements IProductService {
 
     @Override
     public List<Product> getAllProducts() {
-        ResponseEntity<FakeStoreProductDto[]> responseEntity = restTemplate.getForEntity("https://fakestoreapi.com/products", FakeStoreProductDto[].class);
 
-        FakeStoreProductDto[] fakeStoreProductDtos = responseEntity.getBody();
-        if(fakeStoreProductDtos == null)
-            return null;
+        FakeStoreProductDto[] FakeStoreProductDtos = restTemplate.getForObject("https://fakestoreapi.com/products", FakeStoreProductDto[].class);
 
-        List<FakeStoreProductDto> fakeStoreProductDtoList = Arrays.stream(fakeStoreProductDtos).toList();
+        if(FakeStoreProductDtos == null)
+              return null;
 
         List<Product> products = new ArrayList<>();
-        Product product = new Product();
-
-        for (FakeStoreProductDto fakeStoreProductDto:
-             fakeStoreProductDtoList) {
-            product = convertFakeStoreProductDtoToProduct(fakeStoreProductDto);
-            products.add(product);
+        for (FakeStoreProductDto fakeStoreProductDto: FakeStoreProductDtos) {
+           products.add(convertFakeStoreProductDtoToProduct(fakeStoreProductDto));
         }
 
         return products;
@@ -75,6 +69,12 @@ public class FakeStoreProductService implements IProductService {
 
     @Override
     public Product updateProduct(Product product) {
+        return null;
+    }
+
+    //Replace the product for the given id
+    @Override
+    public Product replaceProduct(Long id, Product product) {
         return null;
     }
 

@@ -1,6 +1,7 @@
 package com.mycompany.productservice.controllers;
 
 import com.mycompany.productservice.Interface.IProductService;
+import com.mycompany.productservice.dtos.ProductDto;
 import com.mycompany.productservice.models.Product;
 import com.mycompany.productservice.services.FakeStoreProductService;
 import org.springframework.web.bind.annotation.*;
@@ -45,8 +46,9 @@ public class ProductController {
 
     //Replace Product
     @PutMapping("/{id}")
-    public Product replaceProduct(@PathVariable("id") Long id,@RequestBody Product product) {
-        return new Product();
+    public Product replaceProduct(@PathVariable("id") Long id,@RequestBody ProductDto productDto) {
+        return productService.replaceProduct(id, productDto);
+
     }
 
     @DeleteMapping("/{id}")

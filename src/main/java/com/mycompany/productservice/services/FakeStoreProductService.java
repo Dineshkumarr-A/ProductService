@@ -2,10 +2,14 @@ package com.mycompany.productservice.services;
 
 import com.mycompany.productservice.Interface.IProductService;
 import com.mycompany.productservice.dtos.FakeStoreProductDto;
+import com.mycompany.productservice.dtos.ProductDto;
 import com.mycompany.productservice.models.Category;
 import com.mycompany.productservice.models.Product;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpMessageConverterExtractor;
+import org.springframework.web.client.RequestCallback;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
@@ -16,6 +20,7 @@ import java.util.List;
 public class FakeStoreProductService implements IProductService {
 
     private final RestTemplate restTemplate;
+    private final String url = "https://fakestoreapi.com/products";
 
     FakeStoreProductService(RestTemplate restTemplate)
     {
@@ -38,9 +43,25 @@ public class FakeStoreProductService implements IProductService {
         return product;
     }
 
+    private Product convertProductDtoToProduct(ProductDto productDto)
+    {
+        Product product = new Product();
+        product.setId(productDto.getId());
+        product.setTitle(productDto.getTitle());
+        product.setDescription(productDto.getDescription());
+        product.setPrice(productDto.getPrice());
+        product.setImage(productDto.getImage());
+
+        Category category = new Category();
+        category.setTitle(productDto.getCategory());
+        product.setCategory(category);
+
+        return product;
+    }
+
     @Override
     public Product getProductById(Long id) {
-        FakeStoreProductDto fakeStoreProductDto = restTemplate.getForObject("https://fakestoreapi.com/products/" + id, FakeStoreProductDto.class);
+        FakeStoreProductDto fakeStoreProductDto = restTemplate.getForObject(url + "/" + id, FakeStoreProductDto.class);
         if(fakeStoreProductDto == null)
             return null;
         return convertFakeStoreProductDtoToProduct(fakeStoreProductDto);
@@ -49,7 +70,7 @@ public class FakeStoreProductService implements IProductService {
     @Override
     public List<Product> getAllProducts() {
 
-        FakeStoreProductDto[] FakeStoreProductDtos = restTemplate.getForObject("https://fakestoreapi.com/products", FakeStoreProductDto[].class);
+        FakeStoreProductDto[] FakeStoreProductDtos = restTemplate.getForObject(url, FakeStoreProductDto[].class);
 
         if(FakeStoreProductDtos == null)
               return null;
@@ -74,8 +95,17 @@ public class FakeStoreProductService implements IProductService {
 
     //Replace the product for the given id
     @Override
-    public Product replaceProduct(Long id, Product product) {
-        return null;
+    public Product replaceProduct(Long id, ProductDto productDto) {
+        RequestCallback requestCallback = restTemplate.httpEntityCallback(productDto, ProductDto.class);
+
+        HttpMessageConverterExtractor<ProductDto> responseExtractor = new HttpMessageConverterExtractor<>(ProductDto.class,
+                restTemplate.getMessageConverters());
+
+        ProductDto responseProductDto =  restTemplate.execute(url + "/" + id, HttpMethod.PUT,requestCallback, responseExtractor);
+        if(responseProductDto == null)
+            return null;
+
+        return convertProductDtoToProduct(responseProductDto);
     }
 
     @Override

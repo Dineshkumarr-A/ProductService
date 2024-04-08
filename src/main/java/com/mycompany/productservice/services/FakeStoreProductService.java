@@ -91,7 +91,7 @@ public class FakeStoreProductService implements IProductService {
     }
 
     @Override
-    public Product updateProduct(Product product) {
+    public Product updateProduct(Long id, Product product) {
         return null;
     }
 

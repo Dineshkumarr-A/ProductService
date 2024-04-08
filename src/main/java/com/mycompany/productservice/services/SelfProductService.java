@@ -54,8 +54,23 @@ public class SelfProductService implements IProductService {
     }
 
     @Override
-    public Product updateProduct(Product product) {
-        return null;
+    public Product updateProduct(Long id, Product product) {
+
+
+        Optional<Product> optionalProduct = productRepository.findById(id);
+
+        if(optionalProduct.isEmpty())
+            throw new RuntimeException();
+
+        Product currentProduct = optionalProduct.get();
+
+        if(product.getTitle() != null)
+            currentProduct.setTitle(product.getTitle());
+
+        if(product.getDescription() != null)
+            currentProduct.setDescription(product.getDescription());
+
+        return productRepository.save(currentProduct);
     }
 
     @Override

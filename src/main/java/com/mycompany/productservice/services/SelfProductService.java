@@ -2,6 +2,7 @@ package com.mycompany.productservice.services;
 
 import com.mycompany.productservice.Interface.IProductService;
 import com.mycompany.productservice.dtos.ProductDto;
+import com.mycompany.productservice.exceptions.InvalidProductIdException;
 import com.mycompany.productservice.models.Category;
 import com.mycompany.productservice.models.Product;
 import com.mycompany.productservice.repositories.CategoryRepository;
@@ -27,11 +28,11 @@ public class SelfProductService implements IProductService {
         this.categoryRepository = categoryRepository;
     }
     @Override
-    public Product getProductById(Long id) {
+    public Product getProductById(Long id) throws InvalidProductIdException {
         Optional<Product> product = productRepository.findById(id);
 
         if(product.isEmpty())
-            return null;
+            throw new InvalidProductIdException(id, "Product not found");
 
         return product.get();
     }

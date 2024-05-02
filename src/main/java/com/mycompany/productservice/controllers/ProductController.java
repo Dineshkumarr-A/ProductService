@@ -1,7 +1,9 @@
 package com.mycompany.productservice.controllers;
 
 import com.mycompany.productservice.Interface.IProductService;
+import com.mycompany.productservice.commons.AuthenticationCommons;
 import com.mycompany.productservice.dtos.ProductDto;
+import com.mycompany.productservice.dtos.UserDto;
 import com.mycompany.productservice.exceptions.InvalidProductIdException;
 import com.mycompany.productservice.exceptions.ProductControllerSpecificException;
 import com.mycompany.productservice.models.Product;
@@ -18,10 +20,12 @@ import java.util.List;
 public class ProductController {
 
     private IProductService productService;
+    private AuthenticationCommons authenticationCommons;
 
-    ProductController(IProductService productService)
+    ProductController(IProductService productService, AuthenticationCommons authenticationCommons)
     {
         this.productService = productService;
+        this.authenticationCommons = authenticationCommons;
     }
 
     @GetMapping("/{id}")
@@ -31,10 +35,22 @@ public class ProductController {
         return new ResponseEntity<>(product, HttpStatus.OK);
     }
 
-    @GetMapping
-    public List<Product> getAllProducts()
+    @GetMapping("/all/{token}")
+    public ResponseEntity<List<Product>> getAllProducts(@PathVariable String token)
     {
-        return productService.getAllProducts();
+        //Validate the token using userservice
+
+        UserDto userDto = authenticationCommons.validateToken(token);
+
+        if(userDto == null)
+        {
+            //token is invalid
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        List<Product> products = productService.getAllProducts();
+
+        return new ResponseEntity<>(products,HttpStatus.OK);
     }
 
     @PostMapping

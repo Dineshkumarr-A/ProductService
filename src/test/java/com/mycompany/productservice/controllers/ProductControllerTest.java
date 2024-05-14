@@ -6,15 +6,15 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ProductControllerTest {
 
-    @Test
-    void getProductById() {
-    }
-
-    @Test
-    void getAllProducts() {
-    }
-
-    @Test
-    void createProduct() {
-    }
+//    @Test
+//    void getProductById() {
+//    }
+//
+//    @Test
+//    void getAllProducts() {
+//    }
+//
+//    @Test
+//    void createProduct() {
+//    }
 }

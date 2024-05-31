@@ -18,7 +18,7 @@ public class AuthenticationCommons {
         //Call the API methods
 
         ResponseEntity<UserDto> response = _restTemplate.postForEntity
-                ("http://localhost:2021/users/validate/" + token,
+                ("http://userservice-env.eba-mmj3nfm9.eu-north-1.elasticbeanstalk.com/users/validate/" + token,
                 null,
                 UserDto.class);
 

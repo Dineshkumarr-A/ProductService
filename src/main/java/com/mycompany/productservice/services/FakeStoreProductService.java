@@ -6,6 +6,7 @@ import com.mycompany.productservice.dtos.ProductDto;
 import com.mycompany.productservice.models.Category;
 import com.mycompany.productservice.models.Product;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -22,11 +23,13 @@ import java.util.List;
 public class FakeStoreProductService implements IProductService {
 
     private final RestTemplate restTemplate;
+    private RedisTemplate redisTemplate;
     private final String url = "https://fakestoreapi.com/products";
 
-    FakeStoreProductService(RestTemplate restTemplate)
+    FakeStoreProductService(RestTemplate restTemplate, RedisTemplate redisTemplate)
     {
         this.restTemplate = restTemplate;
+        this.redisTemplate = redisTemplate;
     }
 
     private Product convertFakeStoreProductDtoToProduct(FakeStoreProductDto fakeStoreProductDto)
@@ -63,10 +66,22 @@ public class FakeStoreProductService implements IProductService {
 
     @Override
     public Product getProductById(Long id) {
+
+        Product product = (Product) redisTemplate.opsForHash().get("PRODUCTS", "PRODUCT_" + id);
+
+        if (product != null) {
+            // Cache Hit
+            return product;
+        }
+
         FakeStoreProductDto fakeStoreProductDto = restTemplate.getForObject(url + "/" + id, FakeStoreProductDto.class);
         if(fakeStoreProductDto == null)
             return null;
-        return convertFakeStoreProductDtoToProduct(fakeStoreProductDto);
+        product =  convertFakeStoreProductDtoToProduct(fakeStoreProductDto);
+        redisTemplate.opsForHash().put("PRODUCTS", "PRODUCT_" + id, product);
+
+        //Convert fakeStoreProductDto to product object.
+        return product;
     }
 
     @Override
